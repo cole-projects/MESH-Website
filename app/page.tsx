@@ -878,13 +878,24 @@ function BecomingYOU() {
               Learn more about TanyaTalk →
             </Link>
           </p>
-          <button
-            type="button"
-            onClick={() => scrollToId("waitlist")}
-            className="mt-8 inline-flex items-center justify-center rounded-full bg-mesh px-8 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-mesh-deep"
-          >
-            Join the Waitlist
-          </button>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+            <button
+              type="button"
+              onClick={() => scrollToId("waitlist")}
+              className="inline-flex items-center justify-center rounded-full bg-mesh px-8 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-mesh-deep"
+            >
+              Join the Waitlist
+            </button>
+            <span className="text-sm font-medium text-stone/45">or</span>
+            <div className="inline-flex flex-col items-center rounded-full bg-mesh-pale px-6 py-3 text-stone ring-1 ring-mesh-light">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-mesh sm:text-xs">
+                Call or text Tanya
+              </p>
+              <p className="font-display text-base font-semibold leading-tight tracking-wide sm:text-xl">
+                {DISPLAY_PHONE}
+              </p>
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>

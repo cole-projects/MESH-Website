@@ -1149,11 +1149,12 @@ function Waitlist() {
             BEcomingYOU · Inner Circle
           </p>
           <h2 className="mt-4 mb-6 font-display text-4xl font-light text-white md:text-5xl">
-            Put your name on the waitlist
+            I'm interested
           </h2>
           <p className="mb-12 text-lg leading-relaxed text-white/70">
-            Interested in the 16-week BEcomingYOU program? Leave your name and
-            email — Tanya will reach out when a founding spot opens.
+            No commitment. If the 16-week BEcomingYOU program feels like the
+            right fit when it opens, Tanya will reach out personally. Just drop
+            your info and she'll take it from there.
           </p>
           <div className="space-y-8">
             <PhoneCta

@@ -116,7 +116,7 @@ const navLinks = [
   { label: "Meet Tanya", id: "meet-tanya", href: null },
   { label: "Packages", id: "packages", href: null },
   { label: "TanyaTalk", id: null, href: "/tanyatalk" },
-  { label: "Waitlist", id: "waitlist", href: null },
+  { label: "I'm Interested", id: "waitlist", href: null },
 ];
 
 const pillars = [
@@ -174,7 +174,7 @@ const packages = [
       "Self-paced access — go at your rhythm",
       "TanyaTalk included for ongoing support",
     ],
-    cta: "Join the Waitlist",
+    cta: "I'm Interested",
     href: "#waitlist",
     external: false,
     revealPhone: false,
@@ -191,7 +191,7 @@ const packages = [
       "Weekly live group coaching calls",
       "TanyaTalk included throughout",
     ],
-    cta: "Join the Waitlist",
+    cta: "I'm Interested",
     href: "#waitlist",
     external: false,
     revealPhone: false,
@@ -389,7 +389,7 @@ function Hero() {
             <span className="italic text-mesh-soft">BEcomingYOU program?</span>
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/80 sm:text-xl">
-            Put your name on the waitlist — limited founding spots for the Inner Circle.
+            No commitment. Drop your info and Tanya will reach out personally when BEcomingYOU opens.
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
             <button
@@ -397,7 +397,7 @@ function Hero() {
               onClick={() => scrollToId("waitlist")}
               className="inline-flex items-center justify-center rounded-full bg-mesh px-8 py-4 text-base font-semibold text-white shadow-xl transition hover:bg-mesh-deep sm:text-lg"
             >
-              Join the Waitlist
+              I'm Interested
             </button>
             <button
               type="button"
@@ -884,7 +884,7 @@ function BecomingYOU() {
               onClick={() => scrollToId("waitlist")}
               className="inline-flex items-center justify-center rounded-full bg-mesh px-8 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-mesh-deep"
             >
-              Join the Waitlist
+              I'm Interested
             </button>
             <span className="text-sm font-medium text-stone/45">or</span>
             <div className="inline-flex flex-col items-center rounded-full bg-mesh-pale px-6 py-3 text-stone ring-1 ring-mesh-light">
@@ -1211,7 +1211,7 @@ function Waitlist() {
               </div>
               {error && <p className="text-sm font-medium text-red-500">{error}</p>}
               <button type="submit" disabled={sending} className="flex w-full items-center justify-center gap-2 rounded-full bg-mesh px-8 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-mesh-deep disabled:opacity-70">
-                {sending ? "Joining..." : "Join the Waitlist"}
+                {sending ? "Sending..." : "I'm Interested"}
               </button>
             </>
           )}

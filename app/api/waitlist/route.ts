@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { Resend } from "resend";
 
+const resend = new Resend(process.env.RESEND_API_KEY);
 const WAITLIST_TO = process.env.WAITLIST_EMAIL || "tanya@meshcoaching.com";
 
 type WaitlistBody = {
@@ -29,28 +31,22 @@ export async function POST(request: Request) {
   }
 
   try {
-    // FormSubmit delivers a formatted email to Tanya — no API key required.
-    // First use: Tanya must confirm via a one-time email from FormSubmit.
-    const res = await fetch(`https://formsubmit.co/ajax/${WAITLIST_TO}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        Name: name,
-        Email: email,
-        Phone: phone || "Not provided",
-        _subject: `New BEcomingYOU waitlist signup — ${name}`,
-        _template: "table",
-        _replyto: email,
-        _captcha: "false",
-      }),
+    const { error } = await resend.emails.send({
+      from: "MESH Waitlist <onboarding@resend.dev>",
+      to: WAITLIST_TO,
+      replyTo: email,
+      subject: `New BEcomingYOU waitlist signup — ${name}`,
+      html: `
+        <table>
+          <tr><td><strong>Name</strong></td><td>${name}</td></tr>
+          <tr><td><strong>Email</strong></td><td>${email}</td></tr>
+          <tr><td><strong>Phone</strong></td><td>${phone || "Not provided"}</td></tr>
+        </table>
+      `,
     });
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      console.error("Waitlist email failed:", res.status, text);
+    if (error) {
+      console.error("Waitlist email failed:", error);
       return NextResponse.json(
         {
           error:

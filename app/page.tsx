@@ -373,36 +373,36 @@ function Hero() {
       />
       <div className="absolute inset-0 z-10 bg-mesh-ink/55" />
 
-      <div className="relative z-20 mx-auto max-w-7xl px-4 pt-28 pb-20 sm:px-6 lg:px-8">
+      <div className="relative z-20 mx-auto w-full max-w-7xl px-4 pt-28 pb-20 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9 }}
-          className="max-w-3xl text-white"
+          className="max-w-3xl text-white md:max-w-4xl xl:max-w-5xl"
         >
-          <p className="mb-3 font-display text-2xl font-semibold tracking-wide text-white sm:text-3xl md:text-4xl">
+          <p className="mb-3 font-display text-2xl font-semibold tracking-wide text-white sm:text-3xl md:text-4xl xl:text-5xl">
             Mesh Coaching
           </p>
-          <h1 className="font-display text-4xl font-light leading-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="font-display text-4xl font-light leading-[1.1] text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
             Looking for the 16-week
             <br />
             <span className="italic text-mesh-soft">BEcomingYOU program?</span>
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/80 sm:text-xl">
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/80 sm:text-xl md:max-w-3xl xl:text-2xl">
             No commitment. Drop your info and Tanya will reach out personally when BEcomingYOU opens.
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
             <button
               type="button"
               onClick={() => scrollToId("waitlist")}
-              className="inline-flex items-center justify-center rounded-full bg-mesh px-8 py-4 text-base font-semibold text-white shadow-xl transition hover:bg-mesh-deep sm:text-lg"
+              className="inline-flex items-center justify-center rounded-full bg-mesh px-8 py-4 text-base font-semibold text-white shadow-xl transition hover:bg-mesh-deep sm:text-lg xl:px-10 xl:py-5 xl:text-xl"
             >
-              I'm Interested
+              I&apos;m Interested
             </button>
             <button
               type="button"
               onClick={() => scrollToId("becomingyou")}
-              className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 px-8 py-4 text-base font-semibold text-white backdrop-blur-md transition hover:bg-white/20 sm:text-lg"
+              className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 px-8 py-4 text-base font-semibold text-white backdrop-blur-md transition hover:bg-white/20 sm:text-lg xl:px-10 xl:py-5 xl:text-xl"
             >
               Want to learn more?
             </button>

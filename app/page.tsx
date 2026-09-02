@@ -868,7 +868,7 @@ function BecomingYOU() {
           className="mx-auto mt-14 max-w-3xl text-center"
         >
           <p className="text-base leading-relaxed text-stone/75 md:text-lg">
-            Limited to <span className="font-semibold text-stone">10 founding clients</span>.{" "}
+            Limited to <span className="font-semibold text-stone">10 clients</span>.{" "}
             <span className="font-semibold text-stone">TanyaTalk is included</span> — coaching in your
             pocket between every group call, 24/7 on iMessage.{" "}
             <Link

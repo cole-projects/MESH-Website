@@ -1,17 +1,24 @@
 /**
  * Mesh Coaching — BEcomingYOU Waitlist → Google Sheet
  *
- * Setup:
- * 1. Create a Google Sheet with headers in row 1:
- *    Timestamp | Name | Email | Phone | Interest | Source
- * 2. Extensions → Apps Script
- * 3. Paste this entire file, Save
- * 4. Deploy → New deployment → Type: Web app
+ * Setup (one time):
+ * 1. Create a Google Sheet named e.g. "BEcomingYOU Waitlist"
+ * 2. In row 1, put headers:
+ *    Timestamp | Name | Email | Phone | Source
+ * 3. Extensions → Apps Script
+ * 4. Delete any placeholder code, paste THIS entire file, Save (Ctrl/Cmd+S)
+ * 5. Deploy → New deployment
+ *    - Type: Web app
  *    - Execute as: Me
  *    - Who has access: Anyone
- * 5. Copy the Web app URL into .env.local as:
- *    WAITLIST_WEBHOOK_URL=https://script.google.com/macros/s/.../exec
- * 6. Restart the Next.js dev server
+ * 6. Click Deploy → Authorize → copy the Web app URL
+ * 7. Add to Vercel (Project → Settings → Environment Variables):
+ *    WAITLIST_WEBHOOK_URL=https://script.google.com/macros/s/XXXX/exec
+ *    (Production + Preview)
+ * 8. Also add the same line to local .env.local for testing
+ * 9. Redeploy the site (or push to main)
+ *
+ * After that, every waitlist signup appends a new row to the sheet.
  */
 
 function doPost(e) {
@@ -24,7 +31,6 @@ function doPost(e) {
       data.name || "",
       data.email || "",
       data.phone || "",
-      data.interest || "",
       data.source || "mesh-website",
     ]);
 

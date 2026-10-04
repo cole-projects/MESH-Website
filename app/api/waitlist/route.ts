@@ -1,9 +1,22 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const WAITLIST_TO = "sasshuub@gmail.com";
 const SHEETS_WEBHOOK = process.env.WAITLIST_WEBHOOK_URL;
+
+function getResend() {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null;
+  return new Resend(key);
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
 
 type WaitlistBody = {
   name?: string;
@@ -39,8 +52,18 @@ export async function POST(request: Request) {
     source: "mesh-website",
   };
 
+  const saveError = () =>
+    NextResponse.json(
+      {
+        error:
+          "Could not save your signup. Please email tanya@meshcoaching.com directly.",
+      },
+      { status: 502 }
+    );
+
   try {
-    // 1) Append to Google Sheet (if webhook is configured)
+    let sheetSaved = false;
+
     if (SHEETS_WEBHOOK) {
       const sheetRes = await fetch(SHEETS_WEBHOOK, {
         method: "POST",
@@ -48,49 +71,46 @@ export async function POST(request: Request) {
         body: JSON.stringify(payload),
         redirect: "follow",
       });
-
-      if (!sheetRes.ok) {
-        const text = await sheetRes.text().catch(() => "");
-        console.error("Waitlist sheet webhook failed:", sheetRes.status, text);
-        return NextResponse.json(
-          {
-            error:
-              "Could not save your signup. Please email tanya@meshcoaching.com directly.",
-          },
-          { status: 502 }
-        );
+      const text = await sheetRes.text().catch(() => "");
+      let scriptOk = false;
+      try {
+        scriptOk = JSON.parse(text).ok === true;
+      } catch {
+        scriptOk = false;
       }
+
+      if (!sheetRes.ok || !scriptOk) {
+        console.error("Waitlist sheet webhook failed:", sheetRes.status, text);
+        return saveError();
+      }
+      sheetSaved = true;
     } else {
       console.warn("WAITLIST_WEBHOOK_URL is not set — skipping Google Sheet write");
     }
 
-    // 2) Also email Tanya/Cole (existing Resend flow)
-    const { error } = await resend.emails.send({
-      from: "MESH Waitlist <onboarding@resend.dev>",
-      to: WAITLIST_TO,
-      replyTo: email,
-      subject: `New BEcomingYOU waitlist signup — ${name}`,
-      html: `
+    const resend = getResend();
+    if (resend) {
+      const { error } = await resend.emails.send({
+        from: "MESH Waitlist <onboarding@resend.dev>",
+        to: WAITLIST_TO,
+        replyTo: email,
+        subject: `New BEcomingYOU waitlist signup — ${name}`,
+        html: `
         <table>
-          <tr><td><strong>Name</strong></td><td>${name}</td></tr>
-          <tr><td><strong>Email</strong></td><td>${email}</td></tr>
-          <tr><td><strong>Phone</strong></td><td>${phone || "Not provided"}</td></tr>
+          <tr><td><strong>Name</strong></td><td>${escapeHtml(name)}</td></tr>
+          <tr><td><strong>Email</strong></td><td>${escapeHtml(email)}</td></tr>
+          <tr><td><strong>Phone</strong></td><td>${escapeHtml(phone || "Not provided")}</td></tr>
         </table>
       `,
-    });
+      });
 
-    if (error) {
-      console.error("Waitlist email failed:", error);
-      // Sheet may have saved — still surface email failure lightly
-      if (!SHEETS_WEBHOOK) {
-        return NextResponse.json(
-          {
-            error:
-              "Could not send your signup. Please email tanya@meshcoaching.com directly.",
-          },
-          { status: 502 }
-        );
+      if (error) {
+        console.error("Waitlist email failed:", error);
+        if (!sheetSaved) return saveError();
       }
+    } else if (!sheetSaved) {
+      console.error("Waitlist has no sheet webhook and no Resend API key");
+      return saveError();
     }
 
     return NextResponse.json({ ok: true });

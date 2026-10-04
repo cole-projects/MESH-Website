@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -122,7 +123,7 @@ const navLinks = [
 const pillars = [
   {
     label: "Mental Health",
-    quote: "Learning to use it, so that you are not used by it.",
+    quote: "Learning to use your brain, so that you are not used by it.",
   },
   {
     label: "Emotional Health",
@@ -154,8 +155,8 @@ const packages = [
     description:
       "Master-level coaching in your pocket — available 24/7 on iMessage when life gets loud and you need a clear next step.",
     includes: [
-      "Unlimited text access to TanyaTalk",
-      "Real-time guidance between sessions",
+      "Private text access to TanyaTalk",
+      "Real-time guidance anytime",
       "Remembers your story and patterns",
     ],
     cta: "Check out TanyaTalk",
@@ -182,7 +183,7 @@ const packages = [
   },
   {
     name: "Inner Circle",
-    duration: "16 weeks · All-encompassing",
+    duration: "6 months · All-encompassing",
     description:
       "Everything in Self-Paced, plus live partnership — the full container for lasting change with Tanya beside you.",
     includes: [
@@ -248,6 +249,11 @@ function wrapOffset(value: number, count: number) {
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -256,107 +262,173 @@ function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    if (!open) return;
+    const scrollY = window.scrollY;
+    const { style } = document.body;
+    const previous = {
+      overflow: style.overflow,
+      position: style.position,
+      top: style.top,
+      width: style.width,
+    };
+    style.overflow = "hidden";
+    style.position = "fixed";
+    style.top = `-${scrollY}px`;
+    style.width = "100%";
+    return () => {
+      style.overflow = previous.overflow;
+      style.position = previous.position;
+      style.top = previous.top;
+      style.width = previous.width;
+      window.scrollTo(0, scrollY);
+    };
+  }, [open]);
+
+  function closeAndScroll(id: string) {
+    setOpen(false);
+    window.setTimeout(() => scrollToId(id), 50);
+  }
+
+  const mobileMenu =
+    open && mounted
+      ? createPortal(
+          <div
+            className="fixed inset-0 z-[80] flex h-dvh flex-col bg-mesh-ink lg:hidden"
+            style={{
+              paddingTop: "env(safe-area-inset-top)",
+              paddingBottom: "env(safe-area-inset-bottom)",
+            }}
+          >
+            <div className="flex items-center justify-between gap-3 px-4 py-4">
+              <button
+                type="button"
+                onClick={() => closeAndScroll("hero")}
+                className="flex min-w-0 items-center gap-3"
+                aria-label="Mesh Coaching home"
+              >
+                <img
+                  src="/spiral.png"
+                  alt=""
+                  className="h-10 w-10 object-contain"
+                />
+                <span className="truncate font-display text-xl font-semibold tracking-wide text-white">
+                  Mesh Coaching
+                </span>
+              </button>
+              <button
+                type="button"
+                className="shrink-0 p-2 text-white"
+                onClick={() => setOpen(false)}
+                aria-label="Close menu"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-6 pb-10">
+              {navLinks.map((link) =>
+                link.href ? (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className="border-b border-white/10 pb-4 text-left font-display text-2xl font-light text-white"
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <button
+                    key={link.id}
+                    type="button"
+                    onClick={() => closeAndScroll(link.id!)}
+                    className="border-b border-white/10 pb-4 text-left font-display text-2xl font-light text-white"
+                  >
+                    {link.label}
+                  </button>
+                )
+              )}
+              <PhoneCta
+                label="Call or text Tanya directly"
+                className="mt-2 rounded-full border border-white/50 bg-mesh/30 py-4 text-center text-base font-semibold text-white"
+                revealedClassName="mt-2 rounded-full border border-white/50 bg-mesh/30 px-6 py-4 text-center text-white"
+              />
+            </div>
+          </div>,
+          document.body
+        )
+      : null;
+
   return (
-    <nav
-      className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-        scrolled
-          ? "bg-mesh-dark/95 py-3 shadow-lg backdrop-blur-md"
-          : "bg-transparent py-5"
-      }`}
-    >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <button
-            onClick={() => scrollToId("hero")}
-            className="flex items-center gap-3 shrink-0"
-            aria-label="Mesh Coaching home"
-          >
-            <img
-              src="/spiral.png"
-              alt="Mesh Coaching spiral"
-              className="h-10 w-10 object-contain"
-            />
-            <span className="font-display text-xl font-semibold text-white tracking-wide leading-none">
-              Mesh Coaching
-            </span>
-          </button>
-
-          {/* Desktop links */}
-          <div className="hidden items-center gap-7 lg:flex">
-            {navLinks.map((link) =>
-              link.href ? (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  className="font-sans text-sm font-medium text-white/80 hover:text-mesh-soft transition-colors tracking-wide"
-                >
-                  {link.label}
-                </Link>
-              ) : (
-                <button
-                  key={link.id}
-                  onClick={() => scrollToId(link.id!)}
-                  className="font-sans text-sm font-medium text-white/80 hover:text-mesh-soft transition-colors tracking-wide"
-                >
-                  {link.label}
-                </button>
-              )
-            )}
-            <PhoneCta
-              label="Call or text Tanya directly"
-              icon
-              className="flex items-center gap-2 rounded-full border border-white/50 bg-mesh/20 px-5 py-2.5 text-sm font-semibold text-white shadow-md backdrop-blur-sm transition hover:bg-mesh/40 hover:border-white/70"
-              revealedClassName="rounded-full border border-white/50 bg-mesh/20 px-5 py-2 text-center text-white shadow-md backdrop-blur-sm"
-            />
-          </div>
-
-          {/* Mobile hamburger */}
-          <button
-            className="p-2 text-white lg:hidden"
-            onClick={() => setOpen(!open)}
-            aria-label="Toggle menu"
-          >
-            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      <div
-        className={`fixed inset-0 top-[68px] bg-mesh-ink transition-transform duration-300 lg:hidden ${
-          open ? "translate-x-0" : "translate-x-full"
+    <>
+      <nav
+        className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+          scrolled
+            ? "bg-mesh-dark/95 py-3 shadow-lg backdrop-blur-md"
+            : "bg-transparent py-5"
         }`}
       >
-        <div className="flex flex-col gap-6 p-6">
-          {navLinks.map((link) =>
-            link.href ? (
-              <Link
-                key={link.label}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="border-b border-white/10 pb-4 text-left font-display text-2xl font-light text-white"
-              >
-                {link.label}
-              </Link>
-            ) : (
-              <button
-                key={link.id}
-                onClick={() => { scrollToId(link.id!); setOpen(false); }}
-                className="border-b border-white/10 pb-4 text-left font-display text-2xl font-light text-white"
-              >
-                {link.label}
-              </button>
-            )
-          )}
-          <PhoneCta
-            label="Call or text Tanya directly"
-            className="mt-2 rounded-full border border-white/50 bg-mesh/30 py-4 text-center text-base font-semibold text-white"
-            revealedClassName="mt-2 rounded-full border border-white/50 bg-mesh/30 px-6 py-4 text-center text-white"
-          />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-3">
+            {/* Logo */}
+            <button
+              onClick={() => scrollToId("hero")}
+              className="flex min-w-0 items-center gap-3 shrink-0"
+              aria-label="Mesh Coaching home"
+            >
+              <img
+                src="/spiral.png"
+                alt="Mesh Coaching spiral"
+                className="h-10 w-10 object-contain"
+              />
+              <span className="font-display text-xl font-semibold text-white tracking-wide leading-none truncate">
+                Mesh Coaching
+              </span>
+            </button>
+
+            {/* Desktop links — never show on mobile */}
+            <div className="hidden items-center gap-7 lg:flex">
+              {navLinks.map((link) =>
+                link.href ? (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="font-sans text-sm font-medium text-white/80 hover:text-mesh-soft transition-colors tracking-wide"
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <button
+                    key={link.id}
+                    onClick={() => scrollToId(link.id!)}
+                    className="font-sans text-sm font-medium text-white/80 hover:text-mesh-soft transition-colors tracking-wide"
+                  >
+                    {link.label}
+                  </button>
+                )
+              )}
+              <PhoneCta
+                label="Call or text Tanya directly"
+                icon
+                className="flex items-center gap-2 rounded-full border border-white/50 bg-mesh/20 px-5 py-2.5 text-sm font-semibold text-white shadow-md backdrop-blur-sm transition hover:bg-mesh/40 hover:border-white/70"
+                revealedClassName="rounded-full border border-white/50 bg-mesh/20 px-5 py-2 text-center text-white shadow-md backdrop-blur-sm"
+              />
+            </div>
+
+            {/* Mobile hamburger — only on small screens */}
+            <button
+              type="button"
+              className="shrink-0 p-2 text-white lg:hidden"
+              onClick={() => setOpen(true)}
+              aria-label="Open menu"
+              aria-expanded={open}
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+      {mobileMenu}
+    </>
   );
 }
 
@@ -384,7 +456,7 @@ function Hero() {
             Mesh Coaching
           </p>
           <h1 className="font-display text-4xl font-light leading-[1.1] text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
-            Looking for the 16-week
+            Looking for the 6-month
             <br />
             <span className="italic text-mesh-soft">BEcomingYOU program?</span>
           </h1>
@@ -800,7 +872,7 @@ const innerCircleAccess = [
       "Work through the complete curriculum on identity, nervous system patterns, emotional healing, and how you experience life — at a pace that supports real integration.",
   },
   {
-    title: "Unlimited private text access",
+    title: "Anytime private text access",
     detail:
       "Real-time support during decision points, emotional spirals, identity wobbles, and expansion edges — you don't wait for your next session to recalibrate.",
   },
@@ -835,7 +907,7 @@ function BecomingYOU() {
             BEcomingYOU · The Inner Circle
           </p>
           <h2 className="mt-3 font-display text-4xl font-light leading-tight text-stone md:text-5xl">
-            A 16-week Strategic SOULution™
+            A 6-month Strategic SOULution™
             <br />
             <span className="italic text-mesh-deep">concierge partnership</span>
           </h2>
@@ -1142,21 +1214,25 @@ function Waitlist() {
   }
 
   return (
-    <section id="waitlist" className="overflow-hidden bg-white">
+    <section id="waitlist" className="scroll-mt-24 overflow-hidden bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2">
-        <div className="bg-mesh-dark p-10 text-white md:p-16">
+        <div
+          className={`bg-mesh-dark p-10 text-white md:p-16 ${
+            submitted ? "hidden lg:block" : ""
+          }`}
+        >
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-mesh-soft">
             BEcomingYOU · Inner Circle
           </p>
           <h2 className="mt-4 mb-6 font-display text-4xl font-light text-white md:text-5xl">
-            I'm interested
+            I&apos;m interested
           </h2>
           <p className="mb-12 text-lg leading-relaxed text-white/70">
-            No commitment. If the 16-week BEcomingYOU program feels like the
+            No commitment. If the 6-month BEcomingYOU program feels like the
             right fit when it opens, Tanya will reach out personally. Just drop
-            your info and she'll take it from there.
+            your info and she&apos;ll take it from there.
           </p>
-          <div className="space-y-8">
+          <div className="hidden space-y-8 sm:block">
             <PhoneCta
               label="Call or text Tanya"
               icon
@@ -1173,7 +1249,7 @@ function Waitlist() {
               </div>
             </a>
           </div>
-          <div className="mt-12 flex items-center gap-4">
+          <div className="mt-12 hidden items-center gap-4 sm:flex">
             <a href="https://www.linkedin.com/in/tanya-wannamaker-0889b6ba/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-mesh">
               <LinkedinIcon className="h-5 w-5" />
             </a>
@@ -1192,7 +1268,7 @@ function Waitlist() {
               <CheckCircle className="mb-4 h-12 w-12 text-mesh" />
               <h3 className="font-display text-2xl font-semibold text-stone">You&apos;re on the list</h3>
               <p className="mt-2 max-w-sm text-stone/65">
-                Thank you. Tanya will be in touch when a BEcomingYOU founding spot opens.
+                Thank you. Tanya will be in touch when a BEcomingYOU spot opens.
               </p>
             </div>
           ) : (

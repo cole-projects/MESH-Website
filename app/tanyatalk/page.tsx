@@ -298,7 +298,7 @@ export default function TanyaTalkPage() {
             Also included in
           </p>
           <p className="mt-2 font-display text-xl font-semibold text-stone">
-            BEcomingYOU — 16-week Inner Circle Program
+            BEcomingYOU — 6-month Inner Circle Program
           </p>
           <p className="mt-2 text-sm leading-relaxed text-stone/65">
             TanyaTalk access is bundled with the BEcomingYOU program so you have

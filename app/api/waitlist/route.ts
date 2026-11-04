@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const WAITLIST_TO = "sasshuub@gmail.com";
+const WAITLIST_TO = "tanya@meshcoaching.com";
 const SHEETS_WEBHOOK = process.env.WAITLIST_WEBHOOK_URL;
 
 function getResend() {
